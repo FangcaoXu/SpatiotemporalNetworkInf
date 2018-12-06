@@ -1,4 +1,4 @@
-setwd("C:/Users/fbx5002/Desktop/ThesisCodes")
+setwd("")
 
 # Solution for the permit of Rtools
 Sys.setenv(PATH = paste(Sys.getenv("PATH"), "D:/Rtools/bin/",
@@ -6,27 +6,18 @@ Sys.setenv(PATH = paste(Sys.getenv("PATH"), "D:/Rtools/bin/",
 Sys.setenv(BINPREF = "D:/Rtools/mingw_64/bin")
 assignInNamespace("version_info", c(devtools:::version_info, list("3.5" = list(version_min = "3.3.0", version_max = "99.99.99", path = "bin"))), "devtools")
 find_rtools()
-# print(tools::showNonASCIIfile("C:/Users/fbx5002/Desktop/ThesisCodes/thesis.R"))
-# rsconnect::setAccountInfo(name='fangcaoxu',
-#                           token='DC2393B3873096BE30B023787D8B51C5',
-#                           secret='OeeTaz5KGj7cQ9hKFi9qVXXxUD0i1awzQLO71CAQ')
 
 # Load Libraries ---------------------------------------------------------------------------------------
-#library(BayesX)
 library(combinat)
 library(coda)
 library(dplyr)
 library(fields)
 library(ggplot2)
 library(gridExtra)
-#library(grid)
 library(igraph)
 library(leaflet)
 library(maptools)
 library(mapview)
-#library(networkSpatial)
-#library(NetworkInference, lib.loc="D:/R-3.5.1/library")
-#library(netdiffuseR)
 library(plotly)
 library(plyr)
 library(raster)
@@ -35,14 +26,9 @@ library(reshape2)
 library(rgdal)
 library(rgeos)
 library(RColorBrewer)
-#library(R2BayesX)
 library(shiny)
 library(sp)
-#library(spatsurv)
-#library(stringi)
 library(statnet)
-#library(survival)
-#library(spBayesSurv)
 library(tidyr)
 library(tidyverse)
 
@@ -481,106 +467,3 @@ jpeg("Boxplots.jpg", width = 6000, height = 6000, units = "px", quality = 100, r
 grid.arrange(rboxplot.lambda, rboxplot.max, swboxplot.lambda, swboxplot.max, ncol = 2, nrow=2,
              widths = c(5, 5), top = textGrob("Boxplots of the number of infected nodes for different lambda1 and cutoff values of the diffusion time",gp=gpar(fontface="bold")))
 dev.off()
-
-# # Infer the network -------------------------------------------------------
-# maxtime <- 2000
-# rlambda1<- -2e-05
-# swlambda1<- -9e-06
-# try <- rsimout.df[[5,3]]
-# swcascade <-  swsimout.df[[3,3]]
-# rcascade.l <- as_cascade_long(rcascade)
-# swcascade.l <- as_cascade_long(swcascade)
-# 
-# # Generate by Rcpp::compileAttributes()
-# netinf_ <- function(cascade_nodes, cascade_times, n_edges, model, params, quiet, auto_edges, cutoff) {
-#   .Call(`_NetworkInference_netinf_`, cascade_nodes, cascade_times, n_edges, model, params, quiet, auto_edges, cutoff)
-# }
-# 
-# count_possible_edges_ <- function(cascade_nodes, cascade_times, quiet = TRUE) {
-#   .Call(`_NetworkInference_count_possible_edges_`, cascade_nodes, cascade_times, quiet)
-# }
-# 
-# # Simulate Cascades -------------------------------------------------------
-# coord <- as.matrix(points.df[,-1])
-# DIST <- exponentialHaz()
-# COVMODEL <- ExponentialCovFct() # spatial corvaince function Y_i
-# COVPARS <- c(0.7, 0.1) # \sigma and \phi in spatial covariance function
-# # for exponential hazard: \omega = \theta in my thesis; for weibull: \omega =(\alpha, \lambda)
-# # the \beta here is associated with \lambda in my thesis
-# # cbind or rbind can do for only one vector
-# sim <- simsurv(X = cbind(constant = rep(1, num_nodes)),
-#                beta = 0.0296, dist = DIST, omega = 1,
-#                cov.parameters = COVPARS, cov.model = COVMODEL, coord = coord,
-#                mcmc.control = mcmcpars(nits = 110000, burn = 10000, thin = 100))
-# sim.df <- cbind(sim$survtimes, sim$coords)
-# colnames(sim.df)<- c("survtimes","x","y")
-# # True simulated survival Time
-# survtimes <- sim$survtimes
-# # The exponential distribution with rate ?? has density f(x) = ?? {e}^{- ?? x}
-# # rexp: random generation for the exponential distribution with rate ??
-# # rate = 1/mean(survtimes[,1])
-# censtimes <- rexp(num_nodes, 1/mean(survtimes))
-# # Right-censored data with survival time and status. If the censoring time is less than 
-# # the simulated survival time, the status is 0(alive), otherwise 1(dead)
-# simsurv <- gencens(survtimes, censtimes)
-# simsurv.df <- cbind(data.frame(as.matrix(simsurv)), sim$X)
-# spatcas <- SpatialPointsDataFrame(coord, simsurv.df)
-# m <- leaflet() %>% addTiles('http://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png', 
-#                             attribution='Map tiles by <a href="http://stamen.com">Stamen Design</a>, 
-#                             <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>') %>%
-#   addCircles(data = spatcas, radius=10000, stroke=TRUE, color = "red", opacity = 1, weight = 1, fillOpacity = 1)
-# 
-# estimate <- survspat(Surv(time, status) ~ age + sex, dist=DIST,
-#                      cov.model = COVMODEL,data=spatdat,
-#                      mcmc.control = mcmcpars(nits = 500000, burn = 10000, thin = 490))
-# # Define Edge Score
-# edgeScore <- function (cascade_times, pairid){
-#   timeinterval <- cascade_times[pairid[2]]- cascade_times[pairid[1]]
-# }
-# # Find possible edges for all cascades
-# getpossibleEdges <- function (cascade){
-#   n_cascade <- length(cascade$cascade_nodes)
-#   possibleedges.lst <- list(data.frame(matrix(ncol=2,nrow = 0)))
-#   tmp <- data.frame(matrix(ncol=2,nrow = 0))
-#   for(i in 1:n_cascade){
-#     nsize <- length(cascade$cascade_nodes[[i]]) # node size in ith cascade
-#     for (j in 1:(nsize-1)){
-#       parent <- cascade$cascade_nodes[[i]][j]
-#       t_parent <- cascade$cascade_times[[i]][j]
-#       for(k in (j+1): nsize){
-#         child <- cascade$cascade_nodes[[i]][k]
-#         t_child <- cascade$cascade_times[[i]][k]
-#         if(t_parent == t_child) next
-#         pair_id <- c(parent, child)
-#         score <- edgeScore(pair_id)
-#         tmp <- rbind(tmp, pair_id, stringsAsFactors = FALSE)
-#       }
-#     }
-#     colnames(try) <- c("parent","child")
-#     possibleedges.lst[[i]] <- try
-#   }
-#   return(possibleedges.lst)
-# }
-### reset the colname values in the nested df
-# for (i in 1:12){
-#   for(j in 1:6){
-#     colnames(swsimout.df[[i,j]])[colnames(swsimout.df[[i,j]])=="parentnode"] <- "parent_node"
-#   }
-# }
-# 
-# # Diagnose codes for parameters
-# diag(ratemat.lst[[1]]) <- 0
-# difftimes.lst[[1]] <- matrix(stats::rexp(num_nodes^2, rate = ratemat.lst[[1]]), nrow = num_nodes)
-# rownames(difftimes.lst[[1]]) <- colnames(difftimes.lst[[1]]) <- points$id
-# diag(difftimes.lst[[1]]) <- 0
-# tmp <- difftimes.lst[[1]] 
-# tmp[tmp >= maxtime.vec[1]] <- 0
-# difftimes.df[[1,1]] <- tmp
-# rdifftimes.df[[1,1]]<- (radj - noedge)^2 * difftimes.df[[1,1]]
-# rg.df[[1,1]] <- igraph::graph.adjacency(rdifftimes.df[[1,1]], weighted = TRUE, mode = "directed")
-# shortestpath <- as.vector(igraph::shortest_paths(rg.df[[1,1]], from = 1, mode = "out", output = "vpath", predecessors=TRUE))
-# parentnode <- as.vector(shortestpath$predecessors)
-# dists <- as.vector(igraph::distances(rg.df[[1,1]], v = 1, mode = "out"))
-# tmp <- data.frame("node_name" = V(rg.df[[1,1]])$name, "event_time"= as.numeric(dists),"parent_node" = parentnode, "cascade_id" = 1,stringsAsFactors=FALSE)
-# tmp <- tmp[-which(tmp$event_time==Inf),]
-# rsimout.df[[1,1]] <- rbind(rsimout.df[[1,1]], simulatecascades(k, rg.df[[1,1]]))
